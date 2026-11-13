@@ -6,7 +6,10 @@ frame_time = 0.0
 
 
 def change_mode(mode):
-    pass
+    if stack:
+        stack.pop().finish()
+    stack.append(mode)
+    mode.init()
 
 
 def push_mode(mode):
