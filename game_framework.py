@@ -11,14 +11,19 @@ def change_mode(mode):
     stack.append(mode)
     mode.init()
 
-
 def push_mode(mode):
-    pass
-
+    if stack:
+        stack[-1].pause()
+    stack.append(mode)
+    mode.init()
 
 def pop_mode():
-    pass
-
+    if stack:
+        stack.pop().finish()
+    if stack:
+        stack[-1].resume()
+    else:
+        quit()
 
 def quit():
     global running
