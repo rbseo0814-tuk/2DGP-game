@@ -17,8 +17,17 @@ def pop_mode():
 
 
 def quit():
-    pass
+    global running
+    running = False
 
 
 def run(start_mode):
-    pass
+    global running, stack
+    running = True
+    stack = [start_mode]
+    start_mode.init()
+
+    while running:
+        stack[-1].handle_events()
+        stack[-1].update() 
+        stack[-1].render()
