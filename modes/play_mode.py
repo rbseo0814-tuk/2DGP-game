@@ -5,9 +5,11 @@ from objects.background import Background
 from objects.guard import Guard
 
 guard = None
+font = None     # 임시: 한글 폰트 확인용 (HUD 만들 때 교체)
 
 def init():
-    global guard
+    global guard, font
+    font = load_font('resource/font/Galmuri11.ttf', 24)
 
     background = Background()
     game_world.add_object(background, 0)
@@ -40,4 +42,5 @@ def update():
 def render():
     clear_canvas()
     game_world.render()
+    font.draw(20, 690, '집중력 / 교대까지 48분', (255, 255, 255))   # 임시
     update_canvas()
