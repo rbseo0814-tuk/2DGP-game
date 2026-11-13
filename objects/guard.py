@@ -13,3 +13,6 @@ class Guard:
 
     def update(self):
         self.frame = (self.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_ACTION
+
+    def draw(self):
+        self.image.clip_draw(int(self.frame) * 64, 0, 64, 96, self.x, self.y)
