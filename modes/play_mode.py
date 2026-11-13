@@ -6,7 +6,7 @@ def init():
     pass
 
 def finish():
-    pass
+    game_world.clear()
 
 def pause():
     pass
