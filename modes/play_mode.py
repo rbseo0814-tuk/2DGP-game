@@ -1,9 +1,11 @@
 from pico2d import*
 import game_world
 import game_framework
+from objects.background import Background
 
 def init():
-    pass
+    background = Background()
+    game_world.add_object(background, 0)
 
 def finish():
     game_world.clear()
