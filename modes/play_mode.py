@@ -2,13 +2,23 @@ from pico2d import*
 import game_world
 import game_framework
 from objects.background import Background
+from objects.guard import Guard
+
+guard = None
 
 def init():
+    global guard
+
     background = Background()
     game_world.add_object(background, 0)
 
+    guard = Guard()
+    game_world.add_object(guard, 2)
+
 def finish():
+    global guard
     game_world.clear()
+    guard = None
 
 def pause():
     pass
