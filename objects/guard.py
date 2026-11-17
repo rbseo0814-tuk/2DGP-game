@@ -23,6 +23,23 @@ class Awake:
         self.guard.image.clip_draw(int(self.guard.frame) * 96, 0, 96, 160, self.guard.x, self.guard.y)
 
 
+class Doze:
+    def __init__(self, guard):
+        self.guard = guard
+
+    def enter(self, e):
+        self.guard.frame = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.guard.frame = (self.guard.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_ACTION
+
+    def draw(self):
+        self.guard.image.clip_draw(int(self.guard.frame) * 96, 160, 96, 160, self.guard.x, self.guard.y)
+
+
 class Guard:
     def __init__(self):
         self.image = load_image('resource/image/guard_sheet.png')
