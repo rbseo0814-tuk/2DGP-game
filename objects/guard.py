@@ -11,6 +11,7 @@ DOZE_FOCUS_RATE = 12
 SLEEP_FOCUS_RATE = 20
 
 DOZE_LIMIT = 5.0            # 이 시간(초) 넘게 졸면 SLEEP
+WAKE_DURATION = 0.5         # 화들짝 연출 시간(초)
 
 
 class Awake:
@@ -72,6 +73,26 @@ class Sleep:
         self.guard.image.clip_draw(int(self.guard.frame) * 96, 320, 96, 160, self.guard.x, self.guard.y)
 
 
+class Wake:
+    def __init__(self, guard):
+        self.guard = guard
+
+    def enter(self, e):
+        self.guard.frame = 0
+        self.start_time = get_time()
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.guard.frame = (self.guard.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_ACTION
+        if get_time() - self.start_time >= WAKE_DURATION:
+            self.guard.state_machine.handle_state_event(('TIME_OUT', 0))
+
+    def draw(self):
+        self.guard.image.clip_draw(int(self.guard.frame) * 96, 480, 96, 160, self.guard.x, self.guard.y)
+
+
 class Guard:
     def __init__(self):
         self.image = load_image('resource/image/guard_sheet.png')
@@ -82,12 +103,14 @@ class Guard:
         self.AWAKE = Awake(self)
         self.DOZE = Doze(self)
         self.SLEEP = Sleep(self)
+        self.WAKE = Wake(self)
         self.state_machine = StateMachine(
             self.AWAKE,
             {
                 self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP},
                 self.DOZE: {down_up: self.AWAKE, time_out: self.SLEEP},
                 self.SLEEP: {},
+                self.WAKE: {time_out: self.AWAKE},
             }
         )
 
