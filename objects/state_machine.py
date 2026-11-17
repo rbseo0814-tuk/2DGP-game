@@ -19,6 +19,9 @@ def time_out(e):
 def focus_zero(e):
     return e[0] == 'FOCUS_ZERO'
 
+def wake_up(e):
+    return e[0] == 'WAKE_UP'
+
 
 class StateMachine:
     def __init__(self, start_state, rules):

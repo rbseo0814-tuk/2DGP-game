@@ -1,6 +1,6 @@
 from pico2d import load_image, get_time
 import game_framework
-from objects.state_machine import StateMachine, down_down, down_up, focus_zero, time_out
+from objects.state_machine import StateMachine, down_down, down_up, focus_zero, time_out, space_down, wake_up
 
 FRAMES_PER_ACTION = 4       # 상태마다 프레임 4장
 FRAMES_PER_SECOND = 4.0     # 1초에 넘길 프레임 수
@@ -12,6 +12,7 @@ SLEEP_FOCUS_RATE = 20
 
 DOZE_LIMIT = 5.0            # 이 시간(초) 넘게 졸면 SLEEP
 WAKE_DURATION = 0.5         # 화들짝 연출 시간(초)
+WAKE_TAP_COUNT = 8          # SLEEP에서 깨는 데 필요한 Space 연타 수
 
 
 class Awake:
@@ -60,7 +61,11 @@ class Sleep:
         self.guard = guard
 
     def enter(self, e):
-        self.guard.frame = 0
+        if space_down(e):           # 연타: 자기 전이로 다시 들어옴
+            self.tap_count += 1
+        else:                       # 처음 잠듦
+            self.tap_count = 0
+            self.guard.frame = 0
 
     def exit(self, e):
         pass
@@ -68,6 +73,8 @@ class Sleep:
     def do(self):
         self.guard.frame = (self.guard.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_ACTION
         self.guard.focus = min(FOCUS_MAX, self.guard.focus + SLEEP_FOCUS_RATE * game_framework.frame_time)
+        if self.tap_count >= WAKE_TAP_COUNT:
+            self.guard.state_machine.handle_state_event(('WAKE_UP', 0))
 
     def draw(self):
         self.guard.image.clip_draw(int(self.guard.frame) * 96, 320, 96, 160, self.guard.x, self.guard.y)
@@ -109,7 +116,7 @@ class Guard:
             {
                 self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP},
                 self.DOZE: {down_up: self.AWAKE, time_out: self.SLEEP},
-                self.SLEEP: {},
+                self.SLEEP: {space_down: self.SLEEP, wake_up: self.WAKE},
                 self.WAKE: {time_out: self.AWAKE},
             }
         )
