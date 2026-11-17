@@ -35,6 +35,8 @@ def handle_events():
             game_framework.quit()
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
+        else:
+            guard.handle_event(event)
 
 def update():
     game_world.update()
