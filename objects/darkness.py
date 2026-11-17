@@ -5,6 +5,9 @@ from config import SCREEN_W, SCREEN_H
 DOZE_DARK_RATE = 0.10       # 초당 어둠 비율 변화량 (1.0 = 화면 전체)
 AWAKE_DARK_RATE = -0.30
 
+BAND_W = 20                 # 경계 띠 한 칸 너비(px)
+BAND_STEPS = 10             # 본체(1.0) 포함 단계 수: 1.0, 0.9, ..., 0.1
+
 
 class Darkness:
     def __init__(self, guard):
@@ -27,3 +30,10 @@ class Darkness:
             return
         self.image.opacify(1.0)
         self.image.draw(SCREEN_W - w / 2, SCREEN_H / 2, w, SCREEN_H)   # 오른쪽 끝 기준
+
+        # 경계: 어둠 왼쪽 바깥에 점점 옅어지는 띠 (0.9 → 0.1)
+        edge = SCREEN_W - w
+        for i in range(1, BAND_STEPS):
+            self.image.opacify(1.0 - i / BAND_STEPS)
+            band_right = edge - BAND_W * (i - 1)
+            self.image.draw(band_right - BAND_W / 2, SCREEN_H / 2, BAND_W, SCREEN_H)
