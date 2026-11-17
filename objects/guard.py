@@ -47,6 +47,24 @@ class Doze:
         self.guard.image.clip_draw(int(self.guard.frame) * 96, 160, 96, 160, self.guard.x, self.guard.y)
 
 
+class Sleep:
+    def __init__(self, guard):
+        self.guard = guard
+
+    def enter(self, e):
+        self.guard.frame = 0
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.guard.frame = (self.guard.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_ACTION
+        self.guard.focus = min(FOCUS_MAX, self.guard.focus + SLEEP_FOCUS_RATE * game_framework.frame_time)
+
+    def draw(self):
+        self.guard.image.clip_draw(int(self.guard.frame) * 96, 320, 96, 160, self.guard.x, self.guard.y)
+
+
 class Guard:
     def __init__(self):
         self.image = load_image('resource/image/guard_sheet.png')
@@ -56,11 +74,13 @@ class Guard:
 
         self.AWAKE = Awake(self)
         self.DOZE = Doze(self)
+        self.SLEEP = Sleep(self)
         self.state_machine = StateMachine(
             self.AWAKE,
             {
                 self.AWAKE: {down_down: self.DOZE},
                 self.DOZE: {down_up: self.AWAKE},
+                self.SLEEP: {},
             }
         )
 
