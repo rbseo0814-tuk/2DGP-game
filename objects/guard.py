@@ -1,6 +1,6 @@
 from pico2d import load_image
 import game_framework
-from objects.state_machine import StateMachine
+from objects.state_machine import StateMachine, down_down, down_up
 
 FRAMES_PER_ACTION = 4       # 상태마다 프레임 4장
 FRAMES_PER_SECOND = 4.0     # 1초에 넘길 프레임 수
@@ -47,12 +47,17 @@ class Guard:
         self.frame = 0
 
         self.AWAKE = Awake(self)
+        self.DOZE = Doze(self)
         self.state_machine = StateMachine(
             self.AWAKE,
             {
-                self.AWAKE: {},
+                self.AWAKE: {down_down: self.DOZE},
+                self.DOZE: {down_up: self.AWAKE},
             }
         )
+
+    def handle_event(self, event):
+        self.state_machine.handle_state_event(('INPUT', event))
 
     def update(self):
         self.state_machine.update()
