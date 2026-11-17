@@ -1,6 +1,6 @@
 from pico2d import load_image
 import game_framework
-from objects.state_machine import StateMachine, down_down, down_up
+from objects.state_machine import StateMachine, down_down, down_up, focus_zero
 
 FRAMES_PER_ACTION = 4       # 상태마다 프레임 4장
 FRAMES_PER_SECOND = 4.0     # 1초에 넘길 프레임 수
@@ -24,6 +24,8 @@ class Awake:
     def do(self):
         self.guard.frame = (self.guard.frame + FRAMES_PER_SECOND * game_framework.frame_time) % FRAMES_PER_ACTION
         self.guard.focus = max(0, self.guard.focus + AWAKE_FOCUS_RATE * game_framework.frame_time)
+        if self.guard.focus == 0:
+            self.guard.state_machine.handle_state_event(('FOCUS_ZERO', 0))
 
     def draw(self):
         self.guard.image.clip_draw(int(self.guard.frame) * 96, 0, 96, 160, self.guard.x, self.guard.y)
@@ -78,7 +80,7 @@ class Guard:
         self.state_machine = StateMachine(
             self.AWAKE,
             {
-                self.AWAKE: {down_down: self.DOZE},
+                self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP},
                 self.DOZE: {down_up: self.AWAKE},
                 self.SLEEP: {},
             }
