@@ -9,18 +9,6 @@ from objects.darkness import Darkness
 guard = None
 darkness = None
 
-
-class DebugSilhouette:      # 임시: is_visible 확인용 (확인 후 제거)
-    def __init__(self, x):
-        self.x = x
-
-    def update(self):
-        pass
-
-    def draw(self):
-        if darkness.is_visible(self.x):
-            draw_rectangle(self.x - 30, 120, self.x + 30, 280, 128, 128, 128, 255, True)
-
 def init():
     global guard, darkness
 
@@ -32,8 +20,6 @@ def init():
 
     darkness = Darkness(guard)
     game_world.add_object(darkness, 4)
-
-    game_world.add_object(DebugSilhouette(1000), 1)   # 임시
 
     hud = Hud(guard, darkness)
     game_world.add_object(hud, 5)
