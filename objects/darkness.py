@@ -24,6 +24,9 @@ class Darkness:
         else:                   # AWAKE, WAKE
             self.ratio = max(0.0, self.ratio + AWAKE_DARK_RATE * game_framework.frame_time)
 
+    def is_visible(self, x):
+        return x < SCREEN_W * (1 - self.ratio)     # 검은 본체보다 왼쪽이면 보임
+
     def draw(self):
         w = SCREEN_W * self.ratio
         if w <= 0:
