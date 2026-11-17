@@ -6,8 +6,9 @@ BAR_W, BAR_H = 300, 20
 
 
 class Hud:
-    def __init__(self, guard):
+    def __init__(self, guard, darkness):
         self.guard = guard
+        self.darkness = darkness
         self.font = load_font('resource/font/Galmuri11.ttf', 24)
 
     def update(self):
@@ -27,3 +28,4 @@ class Hud:
         if state == self.guard.SLEEP:
             text += f' {state.tap_count}/{WAKE_TAP_COUNT}'
         self.font.draw(BAR_X + BAR_W + 20, BAR_Y + BAR_H // 2, text, (255, 255, 255))
+        self.font.draw(BAR_X, BAR_Y - 20, f'어둠 {int(self.darkness.ratio * 100)}%', (255, 255, 255))

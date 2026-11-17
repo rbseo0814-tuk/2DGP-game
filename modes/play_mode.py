@@ -4,11 +4,13 @@ import game_framework
 from objects.background import Background
 from objects.guard import Guard
 from objects.hud import Hud
+from objects.darkness import Darkness
 
 guard = None
+darkness = None
 
 def init():
-    global guard
+    global guard, darkness
 
     background = Background()
     game_world.add_object(background, 0)
@@ -16,13 +18,17 @@ def init():
     guard = Guard()
     game_world.add_object(guard, 2)
 
-    hud = Hud(guard)
+    darkness = Darkness(guard)
+    game_world.add_object(darkness, 4)
+
+    hud = Hud(guard, darkness)
     game_world.add_object(hud, 5)
 
 def finish():
-    global guard
+    global guard, darkness
     game_world.clear()
     guard = None
+    darkness = None
 
 def pause():
     pass
