@@ -5,12 +5,14 @@ from objects.background import Background
 from objects.guard import Guard
 from objects.hud import Hud
 from objects.darkness import Darkness
+from objects.clock import Clock
 
 guard = None
 darkness = None
+clock = None
 
 def init():
-    global guard, darkness
+    global guard, darkness, clock
 
     background = Background()
     game_world.add_object(background, 0)
@@ -21,14 +23,18 @@ def init():
     darkness = Darkness(guard)
     game_world.add_object(darkness, 4)
 
+    clock = Clock()
+    game_world.add_object(clock, 5)
+
     hud = Hud(guard, darkness)
     game_world.add_object(hud, 5)
 
 def finish():
-    global guard, darkness
+    global guard, darkness, clock
     game_world.clear()
     guard = None
     darkness = None
+    clock = None
 
 def pause():
     pass
