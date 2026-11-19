@@ -6,8 +6,10 @@ from objects.guard import Guard
 from objects.hud import Hud
 from objects.darkness import Darkness
 from objects.clock import Clock
-from objects.visitor import Visitor
+from objects.spawner import Spawner
+from config import STAGES
 
+day = 1
 guard = None
 darkness = None
 clock = None
@@ -24,10 +26,11 @@ def init():
     darkness = Darkness(guard)
     game_world.add_object(darkness, 4)
 
-    game_world.add_object(Visitor(darkness), 1)     # 임시: 3-3 스포너로 교체
-
     clock = Clock()
     game_world.add_object(clock, 5)
+
+    spawner = Spawner(STAGES[day], clock, darkness)
+    game_world.add_object(spawner, 5)
 
     hud = Hud(guard, darkness, clock)
     game_world.add_object(hud, 5)
