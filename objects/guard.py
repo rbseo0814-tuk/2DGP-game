@@ -1,6 +1,6 @@
 from pico2d import load_image, get_time
 import game_framework
-from objects.state_machine import StateMachine, down_down, down_up, focus_zero, time_out, space_down, wake_up
+from objects.state_machine import StateMachine, down_down, down_up, focus_zero, time_out, space_down, wake_up, f_down
 
 FRAMES_PER_ACTION = 4       # 상태마다 프레임 4장
 FRAMES_PER_SECOND = 4.0     # 1초에 넘길 프레임 수
@@ -14,13 +14,18 @@ DOZE_LIMIT = 5.0            # 이 시간(초) 넘게 졸면 SLEEP
 WAKE_DURATION = 0.5         # 화들짝 연출 시간(초)
 WAKE_TAP_COUNT = 8          # SLEEP에서 깨는 데 필요한 Space 연타 수
 
+FIRE_COOLDOWN = 0.5         # 사격 간 최소 간격(초)
+
 
 class Awake:
     def __init__(self, guard):
         self.guard = guard
 
     def enter(self, e):
-        self.guard.frame = 0
+        if f_down(e):               # 사격: 자기 전이로 다시 들어옴
+            self.guard.fire()
+        else:
+            self.guard.frame = 0
 
     def exit(self, e):
         pass
@@ -106,6 +111,7 @@ class Guard:
         self.x, self.y = 300, 200   # 발 위치 y=120 + 프레임 높이의 절반 80
         self.frame = 0
         self.focus = FOCUS_MAX
+        self.last_fire_time = -FIRE_COOLDOWN    # 첫 발은 바로 쏠 수 있게
 
         self.AWAKE = Awake(self)
         self.DOZE = Doze(self)
@@ -114,7 +120,7 @@ class Guard:
         self.state_machine = StateMachine(
             self.AWAKE,
             {
-                self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP},
+                self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP, f_down: self.AWAKE},
                 self.DOZE: {down_up: self.AWAKE, time_out: self.SLEEP},
                 self.SLEEP: {space_down: self.SLEEP, wake_up: self.WAKE},
                 self.WAKE: {time_out: self.AWAKE},
@@ -123,6 +129,11 @@ class Guard:
 
     def handle_event(self, event):
         self.state_machine.handle_state_event(('INPUT', event))
+
+    def fire(self):
+        if get_time() - self.last_fire_time < FIRE_COOLDOWN:
+            return
+        self.last_fire_time = get_time()
 
     def update(self):
         self.state_machine.update()
