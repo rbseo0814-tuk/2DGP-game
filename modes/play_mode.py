@@ -26,7 +26,7 @@ def init():
     clock = Clock()
     game_world.add_object(clock, 5)
 
-    hud = Hud(guard, darkness)
+    hud = Hud(guard, darkness, clock)
     game_world.add_object(hud, 5)
 
 def finish():
