@@ -1,4 +1,4 @@
-from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_DOWN, SDLK_SPACE
+from sdl2 import SDL_KEYDOWN, SDL_KEYUP, SDLK_DOWN, SDLK_SPACE, SDLK_f
 
 
 # 키 입력 이벤트 판정: e = ('INPUT', sdl_event)
@@ -10,6 +10,9 @@ def down_up(e):
 
 def space_down(e):
     return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_SPACE
+
+def f_down(e):
+    return e[0] == 'INPUT' and e[1].type == SDL_KEYDOWN and e[1].key == SDLK_f
 
 
 # 내부 이벤트 판정: 상태가 직접 만들어 넘기는 이벤트
