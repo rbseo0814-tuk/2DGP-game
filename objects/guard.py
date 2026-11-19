@@ -15,6 +15,7 @@ WAKE_DURATION = 0.5         # 화들짝 연출 시간(초)
 WAKE_TAP_COUNT = 8          # SLEEP에서 깨는 데 필요한 Space 연타 수
 
 FIRE_COOLDOWN = 0.5         # 사격 간 최소 간격(초)
+FIRE_POSE_TIME = 0.3        # 사격 자세를 보여 주는 시간(초)
 
 
 class Awake:
@@ -37,7 +38,12 @@ class Awake:
             self.guard.state_machine.handle_state_event(('FOCUS_ZERO', 0))
 
     def draw(self):
-        self.guard.image.clip_draw(int(self.guard.frame) * 96, 0, 96, 160, self.guard.x, self.guard.y)
+        since_fire = get_time() - self.guard.last_fire_time
+        if since_fire < FIRE_POSE_TIME:     # 사격 직후: 맨 위 줄(y=640)을 0.3초 동안 한 번 재생
+            fire_frame = int(since_fire / FIRE_POSE_TIME * FRAMES_PER_ACTION)
+            self.guard.image.clip_draw(fire_frame * 96, 640, 96, 160, self.guard.x, self.guard.y)
+        else:
+            self.guard.image.clip_draw(int(self.guard.frame) * 96, 0, 96, 160, self.guard.x, self.guard.y)
 
 
 class Doze:
