@@ -6,6 +6,7 @@ from objects.guard import Guard
 from objects.hud import Hud
 from objects.darkness import Darkness
 from objects.clock import Clock
+from objects.visitor import Visitor
 
 guard = None
 darkness = None
@@ -22,6 +23,8 @@ def init():
 
     darkness = Darkness(guard)
     game_world.add_object(darkness, 4)
+
+    game_world.add_object(Visitor(darkness), 1)     # 임시: 3-3 스포너로 교체
 
     clock = Clock()
     game_world.add_object(clock, 5)
