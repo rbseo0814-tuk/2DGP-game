@@ -7,7 +7,8 @@ from objects.hud import Hud
 from objects.darkness import Darkness
 from objects.clock import Clock
 from objects.spawner import Spawner
-from config import STAGES
+from config import STAGES, POST_X
+import modes.result_mode as result_mode
 
 day = 1
 guard = None
@@ -67,8 +68,21 @@ def shoot():
     target.hit()
     return True
 
+def end_shift(text):
+    result_mode.result = text
+    result_mode.score = guard.score
+    game_framework.change_mode(result_mode)
+
 def update():
     game_world.update()
+
+    # 승패 판정: 한 곳에 모아서, 패배를 먼저
+    for v in game_world.world[1]:
+        if v.is_target() and v.x <= POST_X:
+            end_shift('패배: 적군 도착')
+            return
+    if clock.is_over():
+        end_shift('근무 완료')
 
 def render():
     clear_canvas()

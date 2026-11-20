@@ -1,5 +1,7 @@
 SCREEN_W, SCREEN_H = 1280, 720
 
+POST_X = 360                # 위병소 도착선: 적군이 이 x 이하로 오면 패배
+
 # 날짜별 난이도: 등장 종류, 등장 간격(초), 적군 속도(px/s), 동시 접근 수, 집중력 감소 배율
 STAGES = {
     1: dict(kinds=['enemy'],                      interval=15, enemy_speed=40, max_active=1, focus_mul=1.0, tutorial=True),
