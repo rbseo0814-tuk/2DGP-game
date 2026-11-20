@@ -25,6 +25,9 @@ def focus_zero(e):
 def wake_up(e):
     return e[0] == 'WAKE_UP'
 
+def hit(e):
+    return e[0] == 'HIT'
+
 
 class StateMachine:
     def __init__(self, start_state, rules):
