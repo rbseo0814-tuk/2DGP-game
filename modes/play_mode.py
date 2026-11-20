@@ -10,7 +10,7 @@ from objects.spawner import Spawner
 from config import STAGES, POST_X
 import modes.result_mode as result_mode
 
-day = 1
+day = 3     # 임시: 3주차는 접근자 3종 확인용, 4주차 날짜 진행 때 1로
 guard = None
 darkness = None
 clock = None
@@ -77,10 +77,12 @@ def update():
     game_world.update()
 
     # 승패 판정: 한 곳에 모아서, 패배를 먼저
-    for v in game_world.world[1]:
+    for v in game_world.world[1][:]:
         if v.is_target() and v.x <= POST_X:
-            end_shift('패배: 적군 도착')
-            return
+            if v.kind == 'enemy':
+                end_shift('패배: 적군 도착')
+                return
+            game_world.remove_object(v)     # 임시: 아군 도착 시 제거 (3-11 LEAVE로 교체)
     if clock.is_over():
         end_shift('근무 완료')
 

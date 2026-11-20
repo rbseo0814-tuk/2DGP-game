@@ -1,3 +1,4 @@
+import random
 import game_framework
 import game_world
 from objects.visitor import Visitor
@@ -22,7 +23,8 @@ class Spawner:
             return
 
         if len(game_world.world[1]) < self.stage['max_active']:    # 1번 레이어 = 접근자
-            visitor = Visitor(self.darkness, self.stage['enemy_speed'])
+            kind = random.choice(self.stage['kinds'])
+            visitor = Visitor(self.darkness, kind, self.stage['enemy_speed'])
             game_world.add_object(visitor, 1)
             self.timer = self.stage['interval']
         # 자리가 없으면 timer가 0 이하인 채로 대기 → 자리가 나면 바로 등장
