@@ -28,6 +28,9 @@ def wake_up(e):
 def hit(e):
     return e[0] == 'HIT'
 
+def challenge(e):
+    return e[0] == 'CHALLENGE'
+
 
 class StateMachine:
     def __init__(self, start_state, rules):

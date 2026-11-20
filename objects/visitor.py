@@ -61,6 +61,7 @@ class Visitor:
             self.speed = PATROL_SPEED
         else:
             self.speed = OFFICER_SPEED
+        self.challenged = False     # 수하를 받았는지 (순찰조 미수하 감점에 사용)
         self.x, self.y = SCREEN_W + 30, 200     # 화면 오른쪽 밖에서 시작, 근무자와 같은 바닥
 
         self.APPROACH = Approach(self)
@@ -77,6 +78,13 @@ class Visitor:
         self.state_machine.handle_state_event(('HIT', 0))
 
     def is_target(self):            # 사격 대상이 될 수 있는 상태인지
+        return self.state_machine.cur_state == self.APPROACH
+
+    def challenge(self):
+        self.challenged = True
+        self.state_machine.handle_state_event(('CHALLENGE', 0))
+
+    def is_approaching(self):       # 수하 대상이 될 수 있는 상태인지 (아직 수하 전)
         return self.state_machine.cur_state == self.APPROACH
 
     def update(self):
