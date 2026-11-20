@@ -2,7 +2,7 @@ from pico2d import draw_rectangle, get_time
 import game_framework
 import game_world
 from config import SCREEN_W
-from objects.state_machine import StateMachine, hit, challenge, time_out
+from objects.state_machine import StateMachine, hit, challenge, time_out, arrive
 from objects.effects import SpeechBubble
 
 ENEMY_SPEED = 40            # px/s (적군은 날짜별 값을 받음)
@@ -179,7 +179,7 @@ class Visitor:
         self.state_machine = StateMachine(
             self.APPROACH,
             {
-                self.APPROACH: {hit: self.DOWN, challenge: self.CHALLENGED},
+                self.APPROACH: {hit: self.DOWN, challenge: self.CHALLENGED, arrive: self.LEAVE},
                 self.CHALLENGED: {hit: self.DOWN, time_out: self.REVEALED},
                 self.REVEALED: {hit: self.DOWN, time_out: after_reveal},
                 self.ATTACK: {hit: self.DOWN},
@@ -197,6 +197,9 @@ class Visitor:
     def challenge(self):
         self.challenged = True
         self.state_machine.handle_state_event(('CHALLENGE', 0))
+
+    def arrive(self):               # 아군이 수하 없이 위병소 도착 → 복귀
+        self.state_machine.handle_state_event(('ARRIVE', 0))
 
     def is_approaching(self):       # 수하 대상이 될 수 있는 상태인지 (아직 수하 전)
         return self.state_machine.cur_state == self.APPROACH

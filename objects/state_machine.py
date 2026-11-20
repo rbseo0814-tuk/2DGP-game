@@ -31,6 +31,9 @@ def hit(e):
 def challenge(e):
     return e[0] == 'CHALLENGE'
 
+def arrive(e):
+    return e[0] == 'ARRIVE'
+
 
 class StateMachine:
     def __init__(self, start_state, rules):

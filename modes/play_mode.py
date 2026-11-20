@@ -94,12 +94,15 @@ def update():
     if defeat_reason:
         end_shift(defeat_reason)
         return
-    for v in game_world.world[1][:]:
+    for v in game_world.world[1]:
         if v.is_target() and v.x <= POST_X:
             if v.kind == 'enemy':
                 end_shift('패배: 적군 도착')
                 return
-            game_world.remove_object(v)     # 임시: 아군 도착 시 제거 (3-11 LEAVE로 교체)
+            if v.is_approaching():          # 아군이 수하 없이 도착
+                if v.kind == 'patrol':
+                    guard.score -= 50       # 순찰조 미수하 감점
+                v.arrive()                  # 복귀(LEAVE)
     if clock.is_over():
         end_shift('근무 완료')
 
