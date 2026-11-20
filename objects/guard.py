@@ -118,6 +118,7 @@ class Guard:
         self.frame = 0
         self.focus = FOCUS_MAX
         self.last_fire_time = -FIRE_COOLDOWN    # 첫 발은 바로 쏠 수 있게
+        self.score = 0
 
         self.AWAKE = Awake(self)
         self.DOZE = Doze(self)
@@ -140,6 +141,10 @@ class Guard:
         if get_time() - self.last_fire_time < FIRE_COOLDOWN:
             return
         self.last_fire_time = get_time()
+
+        import modes.play_mode as play_mode     # 서로 import하는 꼬임을 피하려고 함수 안에서 import
+        if play_mode.shoot():
+            self.score += 100
 
     def update(self):
         self.state_machine.update()

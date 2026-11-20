@@ -58,6 +58,15 @@ def handle_events():
         else:
             guard.handle_event(event)
 
+def shoot():
+    # 보이는 접근자 중 가장 가까운(x가 가장 작은) 1명을 맞힘. 맞혔으면 True
+    targets = [v for v in game_world.world[1] if v.is_target() and darkness.is_visible(v.x)]
+    if not targets:
+        return False
+    target = min(targets, key=lambda v: v.x)
+    target.hit()
+    return True
+
 def update():
     game_world.update()
 
