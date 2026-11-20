@@ -2,7 +2,8 @@ from pico2d import draw_rectangle, get_time
 import game_framework
 import game_world
 from config import SCREEN_W
-from objects.state_machine import StateMachine, hit, challenge
+from objects.state_machine import StateMachine, hit, challenge, time_out
+from objects.effects import SpeechBubble
 
 ENEMY_SPEED = 40            # px/s (적군은 날짜별 값을 받음)
 PATROL_SPEED = 50
@@ -10,6 +11,18 @@ OFFICER_SPEED = 60
 VISITOR_W, VISITOR_H = 60, 160     # 임시 사각형 크기 (스프라이트로 교체 예정)
 DOWN_DURATION = 1.0         # 쓰러진 뒤 사라질 때까지(초)
 CHALLENGE_STOP = 1.0        # 수하 받고 멈춰 있는 시간(초)
+REVEAL_TIME = 0.5           # 정체 공개 후 서 있는 시간(초)
+
+KIND_COLOR = {              # 정체 공개 후 임시 색 (스프라이트로 교체 예정)
+    'enemy': (170, 50, 50),
+    'patrol': (60, 140, 60),
+    'officer': (60, 90, 180),
+}
+KIND_REPLY = {              # 수하에 대한 응답
+    'enemy': '…',
+    'patrol': '담배! (답어)',
+    'officer': '근무 중 이상 무',
+}
 
 
 class Approach:
@@ -51,6 +64,29 @@ class Challenged:
                        v.x + VISITOR_W / 2, v.y + VISITOR_H / 2, 128, 128, 128, 255, True)
 
 
+class Revealed:
+    def __init__(self, visitor):
+        self.visitor = visitor
+
+    def enter(self, e):
+        v = self.visitor
+        game_world.add_object(SpeechBubble(KIND_REPLY[v.kind], v.x, v.y + VISITOR_H / 2 + 10), 3)
+        self.start_time = get_time()
+
+    def exit(self, e):
+        pass
+
+    def do(self):                   # 서서 응답
+        if get_time() - self.start_time >= REVEAL_TIME:
+            self.visitor.state_machine.handle_state_event(('TIME_OUT', 0))
+
+    def draw(self):                 # 정체 공개: 종류별 색
+        v = self.visitor
+        r, g, b = KIND_COLOR[v.kind]
+        draw_rectangle(v.x - VISITOR_W / 2, v.y - VISITOR_H / 2,
+                       v.x + VISITOR_W / 2, v.y + VISITOR_H / 2, r, g, b, 255, True)
+
+
 class Down:
     def __init__(self, visitor):
         self.visitor = visitor
@@ -87,12 +123,14 @@ class Visitor:
 
         self.APPROACH = Approach(self)
         self.CHALLENGED = Challenged(self)
+        self.REVEALED = Revealed(self)
         self.DOWN = Down(self)
         self.state_machine = StateMachine(
             self.APPROACH,
             {
                 self.APPROACH: {hit: self.DOWN, challenge: self.CHALLENGED},
-                self.CHALLENGED: {hit: self.DOWN},
+                self.CHALLENGED: {hit: self.DOWN, time_out: self.REVEALED},
+                self.REVEALED: {hit: self.DOWN},
                 self.DOWN: {},
             }
         )
