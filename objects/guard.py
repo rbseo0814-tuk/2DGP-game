@@ -1,5 +1,7 @@
 from pico2d import load_image, get_time
 import game_framework
+import game_world
+from objects.effects import MuzzleFlash
 from objects.state_machine import StateMachine, down_down, down_up, focus_zero, time_out, space_down, wake_up, f_down
 
 FRAMES_PER_ACTION = 4       # 상태마다 프레임 4장
@@ -16,6 +18,7 @@ WAKE_TAP_COUNT = 8          # SLEEP에서 깨는 데 필요한 Space 연타 수
 
 FIRE_COOLDOWN = 0.5         # 사격 간 최소 간격(초)
 FIRE_POSE_TIME = 0.3        # 사격 자세를 보여 주는 시간(초)
+MUZZLE_DX, MUZZLE_DY = 47, 12   # 근무자 중심 → 총구 끝 거리(px)
 
 
 class Awake:
@@ -141,6 +144,7 @@ class Guard:
         if get_time() - self.last_fire_time < FIRE_COOLDOWN:
             return
         self.last_fire_time = get_time()
+        game_world.add_object(MuzzleFlash(self.x + MUZZLE_DX, self.y + MUZZLE_DY), 3)
 
         import modes.play_mode as play_mode     # 서로 import하는 꼬임을 피하려고 함수 안에서 import
         if play_mode.shoot():
