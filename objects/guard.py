@@ -153,6 +153,9 @@ class Guard:
         if target and target.kind == 'enemy':      # 적군 격퇴만 점수
             self.score += 100
 
+    def is_napping(self):           # 졸거나 자는 중인지 (당직사관 발각 판정용)
+        return self.state_machine.cur_state in (self.DOZE, self.SLEEP)
+
     def challenge(self):
         import modes.play_mode as play_mode
         if play_mode.challenge():           # 대상이 있을 때만 말풍선

@@ -7,7 +7,7 @@ from objects.hud import Hud
 from objects.darkness import Darkness
 from objects.clock import Clock
 from objects.spawner import Spawner
-from config import STAGES, POST_X
+from config import STAGES, POST_X, SCREEN_W
 import modes.result_mode as result_mode
 
 day = 3     # 임시: 3주차는 접근자 3종 확인용, 4주차 날짜 진행 때 1로
@@ -94,6 +94,11 @@ def update():
     if defeat_reason:
         end_shift(defeat_reason)
         return
+    if guard.is_napping():
+        for v in game_world.world[1]:
+            if v.kind == 'officer' and v.state_machine.cur_state != v.DOWN and v.x < SCREEN_W / 2:
+                end_shift('패배: 발각')
+                return
     for v in game_world.world[1]:
         if v.is_target() and v.x <= POST_X:
             if v.kind == 'enemy':
