@@ -28,6 +28,8 @@ class Awake:
     def enter(self, e):
         if f_down(e):               # 사격: 자기 전이로 다시 들어옴
             self.guard.fire()
+        elif space_down(e):         # 수하: 자기 전이로 다시 들어옴
+            self.guard.challenge()
         else:
             self.guard.frame = 0
 
@@ -130,7 +132,7 @@ class Guard:
         self.state_machine = StateMachine(
             self.AWAKE,
             {
-                self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP, f_down: self.AWAKE},
+                self.AWAKE: {down_down: self.DOZE, focus_zero: self.SLEEP, f_down: self.AWAKE, space_down: self.AWAKE},
                 self.DOZE: {down_up: self.AWAKE, time_out: self.SLEEP},
                 self.SLEEP: {space_down: self.SLEEP, wake_up: self.WAKE},
                 self.WAKE: {time_out: self.AWAKE},
@@ -149,6 +151,10 @@ class Guard:
         import modes.play_mode as play_mode     # 서로 import하는 꼬임을 피하려고 함수 안에서 import
         if play_mode.shoot():
             self.score += 100
+
+    def challenge(self):
+        import modes.play_mode as play_mode
+        play_mode.challenge()
 
     def update(self):
         self.state_machine.update()
