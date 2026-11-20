@@ -4,7 +4,9 @@ import game_world
 from config import SCREEN_W
 from objects.state_machine import StateMachine, hit
 
-ENEMY_SPEED = 40            # px/s
+ENEMY_SPEED = 40            # px/s (적군은 날짜별 값을 받음)
+PATROL_SPEED = 50
+OFFICER_SPEED = 60
 VISITOR_W, VISITOR_H = 60, 160     # 임시 사각형 크기 (스프라이트로 교체 예정)
 DOWN_DURATION = 1.0         # 쓰러진 뒤 사라질 때까지(초)
 
@@ -50,9 +52,15 @@ class Down:
 
 
 class Visitor:
-    def __init__(self, darkness, speed=ENEMY_SPEED):
+    def __init__(self, darkness, kind, enemy_speed=ENEMY_SPEED):
         self.darkness = darkness
-        self.speed = speed
+        self.kind = kind            # 'enemy' / 'patrol' / 'officer'
+        if kind == 'enemy':
+            self.speed = enemy_speed
+        elif kind == 'patrol':
+            self.speed = PATROL_SPEED
+        else:
+            self.speed = OFFICER_SPEED
         self.x, self.y = SCREEN_W + 30, 200     # 화면 오른쪽 밖에서 시작, 근무자와 같은 바닥
 
         self.APPROACH = Approach(self)
