@@ -68,6 +68,15 @@ def shoot():
     target.hit()
     return True
 
+def challenge():
+    # 아직 수하 받지 않은 보이는 접근자 중 가장 가까운 1명에게 수하. 대상이 없으면 None
+    targets = [v for v in game_world.world[1] if v.is_approaching() and darkness.is_visible(v.x)]
+    if not targets:
+        return None
+    target = min(targets, key=lambda v: v.x)
+    target.challenge()
+    return target
+
 def end_shift(text):
     result_mode.result = text
     result_mode.score = guard.score
