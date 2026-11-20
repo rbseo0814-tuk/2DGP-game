@@ -149,7 +149,8 @@ class Guard:
         game_world.add_object(MuzzleFlash(self.x + MUZZLE_DX, self.y + MUZZLE_DY), 3)
 
         import modes.play_mode as play_mode     # 서로 import하는 꼬임을 피하려고 함수 안에서 import
-        if play_mode.shoot():
+        target = play_mode.shoot()
+        if target and target.kind == 'enemy':      # 적군 격퇴만 점수
             self.score += 100
 
     def challenge(self):

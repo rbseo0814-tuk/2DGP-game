@@ -14,9 +14,11 @@ day = 3     # 임시: 3주차는 접근자 3종 확인용, 4주차 날짜 진행
 guard = None
 darkness = None
 clock = None
+defeat_reason = None    # 판정 시점(update)까지 미뤄 둔 패배 원인 (예: 오인 사격)
 
 def init():
-    global guard, darkness, clock
+    global guard, darkness, clock, defeat_reason
+    defeat_reason = None
 
     background = Background()
     game_world.add_object(background, 0)
@@ -60,13 +62,16 @@ def handle_events():
             guard.handle_event(event)
 
 def shoot():
-    # 보이는 접근자 중 가장 가까운(x가 가장 작은) 1명을 맞힘. 맞혔으면 True
+    # 보이는 접근자 중 가장 가까운(x가 가장 작은) 1명을 맞힘. 맞힌 접근자를 돌려줌, 없으면 None
+    global defeat_reason
     targets = [v for v in game_world.world[1] if v.is_target() and darkness.is_visible(v.x)]
     if not targets:
-        return False
+        return None
     target = min(targets, key=lambda v: v.x)
     target.hit()
-    return True
+    if target.kind != 'enemy':
+        defeat_reason = '패배: 오인 사격'    # 바로 끝내지 않고 update에서 판정
+    return target
 
 def challenge():
     # 아직 수하 받지 않은 보이는 접근자 중 가장 가까운 1명에게 수하. 대상이 없으면 None
@@ -86,6 +91,9 @@ def update():
     game_world.update()
 
     # 승패 판정: 한 곳에 모아서, 패배를 먼저
+    if defeat_reason:
+        end_shift(defeat_reason)
+        return
     for v in game_world.world[1][:]:
         if v.is_target() and v.x <= POST_X:
             if v.kind == 'enemy':
