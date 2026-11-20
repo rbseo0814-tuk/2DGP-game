@@ -70,6 +70,7 @@ class Revealed:
 
     def enter(self, e):
         v = self.visitor
+        v.revealed = True
         game_world.add_object(SpeechBubble(KIND_REPLY[v.kind], v.x, v.y + VISITOR_H / 2 + 10), 3)
         self.start_time = get_time()
 
@@ -81,6 +82,48 @@ class Revealed:
             self.visitor.state_machine.handle_state_event(('TIME_OUT', 0))
 
     def draw(self):                 # 정체 공개: 종류별 색
+        v = self.visitor
+        r, g, b = KIND_COLOR[v.kind]
+        draw_rectangle(v.x - VISITOR_W / 2, v.y - VISITOR_H / 2,
+                       v.x + VISITOR_W / 2, v.y + VISITOR_H / 2, r, g, b, 255, True)
+
+
+class Attack:                       # 적군: 정체 공개 후 계속 접근
+    def __init__(self, visitor):
+        self.visitor = visitor
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.visitor.x -= self.visitor.speed * game_framework.frame_time
+
+    def draw(self):
+        v = self.visitor
+        r, g, b = KIND_COLOR[v.kind]
+        draw_rectangle(v.x - VISITOR_W / 2, v.y - VISITOR_H / 2,
+                       v.x + VISITOR_W / 2, v.y + VISITOR_H / 2, r, g, b, 255, True)
+
+
+class Leave:                        # 아군: 오른쪽으로 복귀, 화면 밖에서 제거
+    def __init__(self, visitor):
+        self.visitor = visitor
+
+    def enter(self, e):
+        pass
+
+    def exit(self, e):
+        pass
+
+    def do(self):
+        self.visitor.x += self.visitor.speed * game_framework.frame_time
+        if self.visitor.x > SCREEN_W + 50:
+            game_world.remove_object(self.visitor)
+
+    def draw(self):
         v = self.visitor
         r, g, b = KIND_COLOR[v.kind]
         draw_rectangle(v.x - VISITOR_W / 2, v.y - VISITOR_H / 2,
@@ -103,9 +146,13 @@ class Down:
 
     def draw(self):
         v = self.visitor
+        if v.revealed:                          # 정체 공개 후면 종류별 색을 어둡게
+            r, g, b = (c // 2 for c in KIND_COLOR[v.kind])
+        else:
+            r, g, b = 80, 80, 80
         bottom = v.y - VISITOR_H / 2            # 바닥에 눕힌 사각형
         draw_rectangle(v.x - VISITOR_H / 2, bottom,
-                       v.x + VISITOR_H / 2, bottom + VISITOR_W, 80, 80, 80, 255, True)
+                       v.x + VISITOR_H / 2, bottom + VISITOR_W, r, g, b, 255, True)
 
 
 class Visitor:
@@ -119,18 +166,24 @@ class Visitor:
         else:
             self.speed = OFFICER_SPEED
         self.challenged = False     # 수하를 받았는지 (순찰조 미수하 감점에 사용)
+        self.revealed = False       # 정체가 공개됐는지
         self.x, self.y = SCREEN_W + 30, 200     # 화면 오른쪽 밖에서 시작, 근무자와 같은 바닥
 
         self.APPROACH = Approach(self)
         self.CHALLENGED = Challenged(self)
         self.REVEALED = Revealed(self)
+        self.ATTACK = Attack(self)
+        self.LEAVE = Leave(self)
         self.DOWN = Down(self)
+        after_reveal = self.ATTACK if kind == 'enemy' else self.LEAVE    # 적군은 공격, 아군은 복귀
         self.state_machine = StateMachine(
             self.APPROACH,
             {
                 self.APPROACH: {hit: self.DOWN, challenge: self.CHALLENGED},
                 self.CHALLENGED: {hit: self.DOWN, time_out: self.REVEALED},
-                self.REVEALED: {hit: self.DOWN},
+                self.REVEALED: {hit: self.DOWN, time_out: after_reveal},
+                self.ATTACK: {hit: self.DOWN},
+                self.LEAVE: {},
                 self.DOWN: {},
             }
         )
@@ -139,7 +192,7 @@ class Visitor:
         self.state_machine.handle_state_event(('HIT', 0))
 
     def is_target(self):            # 사격 대상이 될 수 있는 상태인지 (DOWN·LEAVE 제외)
-        return self.state_machine.cur_state != self.DOWN
+        return self.state_machine.cur_state not in (self.DOWN, self.LEAVE)
 
     def challenge(self):
         self.challenged = True
