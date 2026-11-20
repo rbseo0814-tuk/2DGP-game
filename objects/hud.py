@@ -25,6 +25,7 @@ class Hud:
         draw_rectangle(BAR_X, BAR_Y, BAR_X + BAR_W, BAR_Y + BAR_H, 255, 255, 255)
 
         self.font.draw(SCREEN_W - 100, BAR_Y + BAR_H + 20, self.clock.time_text(), (255, 255, 255))
+        self.font.draw(SCREEN_W - 160, BAR_Y + BAR_H // 2, f'점수 {self.guard.score}', (255, 255, 255))
 
         # 디버그: 현재 상태 (최종 제출 전 제거)
         state = self.guard.state_machine.cur_state
