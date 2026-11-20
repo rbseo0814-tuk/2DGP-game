@@ -1,7 +1,7 @@
 from pico2d import load_image, get_time
 import game_framework
 import game_world
-from objects.effects import MuzzleFlash
+from objects.effects import MuzzleFlash, SpeechBubble
 from objects.state_machine import StateMachine, down_down, down_up, focus_zero, time_out, space_down, wake_up, f_down
 
 FRAMES_PER_ACTION = 4       # 상태마다 프레임 4장
@@ -154,7 +154,8 @@ class Guard:
 
     def challenge(self):
         import modes.play_mode as play_mode
-        play_mode.challenge()
+        if play_mode.challenge():           # 대상이 있을 때만 말풍선
+            game_world.add_object(SpeechBubble('손들어! 화랑!', self.x, self.y + 100), 3)
 
     def update(self):
         self.state_machine.update()
