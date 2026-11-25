@@ -10,7 +10,7 @@ from objects.spawner import Spawner
 from config import STAGES, POST_X, SCREEN_W
 import modes.result_mode as result_mode
 
-day = 3     # 임시: 3주차는 접근자 3종 확인용, 4주차 날짜 진행 때 1로
+day = 1     # 몇 일 차 근무인지 (결과 화면이 다음 날·같은 날로 바꿈)
 guard = None
 darkness = None
 clock = None
@@ -82,9 +82,11 @@ def challenge():
     target.challenge()
     return target
 
-def end_shift(text):
+def end_shift(text, cleared=False):
     result_mode.result = text
     result_mode.score = guard.score
+    result_mode.cleared = cleared
+    result_mode.day = day
     game_framework.change_mode(result_mode)
 
 def update():
@@ -109,7 +111,7 @@ def update():
                     guard.score -= 50       # 순찰조 미수하 감점
                 v.arrive()                  # 복귀(LEAVE)
     if clock.is_over():
-        end_shift('근무 완료')
+        end_shift('근무 완료', cleared=True)
 
 def render():
     clear_canvas()
