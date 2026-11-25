@@ -3,8 +3,12 @@ import game_framework
 import modes.play_mode as play_mode
 from config import SCREEN_W, SCREEN_H
 
+LAST_DAY = 5    # 마지막 근무 날짜 (클리어하면 1일 차로)
+
 result = ''     # play_mode가 넘겨주는 결과 문구 (예: '근무 완료', '패배: 적군 도착')
 score = 0
+cleared = False # 클리어했는지 → 다음 날 / 패배 → 같은 날
+day = 1         # 방금 끝난 근무 날짜
 font = None
 
 
@@ -30,7 +34,11 @@ def handle_events():
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             game_framework.quit()
         elif event.type == SDL_KEYDOWN:
-            game_framework.change_mode(play_mode)   # 같은 날짜로 다시 근무
+            if cleared:
+                play_mode.day = day + 1 if day < LAST_DAY else 1    # 다음 날 (5일 차 다음은 1일 차)
+            else:
+                play_mode.day = day                                 # 같은 날 다시
+            game_framework.change_mode(play_mode)
 
 def update():
     pass
