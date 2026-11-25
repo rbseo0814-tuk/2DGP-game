@@ -46,8 +46,18 @@ def update():
 def render():
     clear_canvas()
     draw_rectangle(0, 0, SCREEN_W, SCREEN_H, 0, 0, 0, 255, True)     # 검은 배경
+    if cleared and day == LAST_DAY:     # 마지막 날 클리어 (임시 엔딩)
+        title = '전역!'
+        guide = '아무 키나 누르면 1일 차부터 다시 · ESC 종료'
+    elif cleared:
+        title = f'{day}일 차 {result}'
+        guide = f'아무 키나 누르면 다음 근무 ({day + 1}일 차) · ESC 종료'
+    else:
+        title = f'{day}일 차 {result}'
+        guide = f'아무 키나 누르면 다시 근무 ({day}일 차) · ESC 종료'
+
     cx, cy = SCREEN_W // 2, SCREEN_H // 2
-    font.draw(cx - 150, cy + 60, result, (255, 255, 255))
+    font.draw(cx - 150, cy + 60, title, (255, 255, 255))
     font.draw(cx - 150, cy, f'점수 {score}', (255, 255, 255))
-    font.draw(cx - 150, cy - 80, '아무 키나 누르면 다시 근무 · ESC 종료', (180, 180, 180))
+    font.draw(cx - 150, cy - 80, guide, (180, 180, 180))
     update_canvas()
