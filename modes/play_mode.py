@@ -7,6 +7,7 @@ from objects.hud import Hud
 from objects.darkness import Darkness
 from objects.clock import Clock
 from objects.spawner import Spawner
+from objects.tutorial import Tutorial
 from config import STAGES, POST_X, SCREEN_W
 import modes.result_mode as result_mode
 
@@ -37,6 +38,9 @@ def init():
 
     hud = Hud(guard, darkness, clock, day)
     game_world.add_object(hud, 5)
+
+    if STAGES[day].get('tutorial'):     # 1일 차에만 조작 안내
+        game_world.add_object(Tutorial(), 5)
 
 def finish():
     global guard, darkness, clock
