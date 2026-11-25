@@ -35,7 +35,7 @@ def init():
     spawner = Spawner(STAGES[day], clock, darkness)
     game_world.add_object(spawner, 5)
 
-    hud = Hud(guard, darkness, clock)
+    hud = Hud(guard, darkness, clock, day)
     game_world.add_object(hud, 5)
 
 def finish():

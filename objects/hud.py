@@ -7,10 +7,11 @@ BAR_W, BAR_H = 300, 20
 
 
 class Hud:
-    def __init__(self, guard, darkness, clock):
+    def __init__(self, guard, darkness, clock, day):
         self.guard = guard
         self.darkness = darkness
         self.clock = clock
+        self.day = day              # 몇 일 차 근무인지 (근무 중엔 안 바뀜)
         self.font = load_font('resource/font/Galmuri11.ttf', 24)
 
     def update(self):
@@ -24,6 +25,7 @@ class Hud:
             draw_rectangle(BAR_X, BAR_Y, BAR_X + fill_w, BAR_Y + BAR_H, 255, 210, 0, 255, True)
         draw_rectangle(BAR_X, BAR_Y, BAR_X + BAR_W, BAR_Y + BAR_H, 255, 255, 255)
 
+        self.font.draw(SCREEN_W - 200, BAR_Y + BAR_H + 20, f'{self.day}일 차', (255, 255, 255))
         self.font.draw(SCREEN_W - 100, BAR_Y + BAR_H + 20, self.clock.time_text(), (255, 255, 255))
         self.font.draw(SCREEN_W - 160, BAR_Y + BAR_H // 2, f'점수 {self.guard.score}', (255, 255, 255))
 
